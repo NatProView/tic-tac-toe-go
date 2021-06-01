@@ -6,7 +6,9 @@ import (
 	"time"
 )
 
-//gracz vs gracz, dwa inputy od uzytkownika
+//funkcja pozwalająca na odczytanie inputu od uzytkownika
+//wywołanie jej skutkuje zmiana jednego elementu arraya na znak X albo Y
+
 func input(field **[]string, char string) { //0 ok | 1 nie ok XD
 	var input int
 	isOk := false
@@ -27,7 +29,9 @@ func input(field **[]string, char string) { //0 ok | 1 nie ok XD
 
 }
 
-func inputBot(field **[]string, char string) { //0 ok | 1 nie ok XD
+//funkcja generująca input od bota,
+//wywołanie jej skutkuje zmiana jednego elementu arraya na znak X albo Y
+func inputBot(field **[]string, char string) {
 	var input int
 	isOk := false
 	fmt.Printf("\n\tTurn of [%s]\n", char)
@@ -45,21 +49,29 @@ func inputBot(field **[]string, char string) { //0 ok | 1 nie ok XD
 
 }
 
+//tryb gry player vs player, bierze dwa inputy od graczy, na zmiane
+
 func pvp(field *[]string) int {
 	clear()
-	for i := 0; i < 10; i++ {
+
+	//kazda kolejna iteracja funkcji to kolejna tura gry
+	// dla i parzystego tura [X]
+	// dla i nieparzystego tura [O]
+	for i := 0; i < 9; i++ {
 
 		draw(*field)
+		turn := i % 2
 
-		if i%2 == 0 {
+		if turn == 0 { //i parzyste, tura [X]
 			input((&field), "X")
-		} else {
+		} else { //i nieparzyste, tura [O]
 			input((&field), "O")
 		}
+
 		switch check(*field) {
 		case 1:
 			clear()
-			return i % 2 // 0: [X]	1: [O]
+			return turn // 0: [X]	1: [O]
 		case 2:
 			clear()
 			return 3 // remis
@@ -68,17 +80,21 @@ func pvp(field *[]string) int {
 		clear()
 
 	}
-	return -1
+	return -1 //błąd
 }
 
 //AI vs AI, zero inputu od uzytkownika
 func eve(field *[]string) int {
 	clear()
+	// kazda kolejna iteracja funkcji to kolejna tura gry
+	// dla i parzystego tura [X]
+	// dla i nieparzystego tura [O]
 	for i := 0; i < 9; i++ {
 
 		draw(*field)
+		turn := i % 2
 
-		if i%2 == 0 {
+		if turn == 0 {
 			inputBot((&field), "X")
 		} else {
 			inputBot((&field), "O")
@@ -86,7 +102,7 @@ func eve(field *[]string) int {
 		switch check(*field) {
 		case 1:
 			clear()
-			return i % 2 // 0: [X]	1: [O]
+			return turn // 0: [X]	1: [O]
 		case 2:
 			clear()
 			return 3 // remis
@@ -98,16 +114,16 @@ func eve(field *[]string) int {
 	return -1
 }
 
-//gracs vs AI, jeden input od uzytkownika
+//gracz vs AI, jeden input od uzytkownika
 func pve(field *[]string) int {
-	var random bool
+	var playerStarts bool
 	var temp string
 	if rand.Intn(2) == 1 {
 		fmt.Println("Player gets [X] and starts the game")
-		random = true //player gets [x]
+		playerStarts = true //player gets [x]
 	} else {
 		fmt.Println("AI gets [X] and starts the game")
-		random = false //bot gets [x]
+		playerStarts = false //bot gets [x]
 	}
 
 	for temp != "y" {
@@ -116,6 +132,10 @@ func pve(field *[]string) int {
 	}
 	clear()
 	var turn bool
+
+	// kazda kolejna iteracja funkcji to kolejna tura gry
+	// dla i parzystego tura [X]
+	// dla i nieparzystego tura [O]
 	for i := 0; i < 9; i++ {
 
 		if i%2 == 0 {
@@ -127,13 +147,13 @@ func pve(field *[]string) int {
 		draw(*field)
 
 		switch {
-		case turn && random:
+		case turn && playerStarts: //tura parzysta [X], gracz zaczyna
 			input((&field), "X")
-		case turn && !random:
+		case turn && !playerStarts: //tura przysta [X], AI zaczyna
 			inputBot((&field), "X")
-		case !turn && random:
+		case !turn && playerStarts: //tura nieparzysta [O], gracz zaczyna
 			inputBot((&field), "O")
-		case !turn && !random:
+		case !turn && !playerStarts: //tura nieparzysta [O], AI zaczyna
 			input((&field), "O")
 		}
 

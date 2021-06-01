@@ -8,15 +8,22 @@ import (
 )
 
 func main() {
+	//deklaracja arraya zawierającego znak wyswietlany w grze
 	field := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 	var winner int
+
+	//funkcja witająca gracza przy starcie gry
 	hello()
 
+	//wybór trybu gry, kazda z funkcji zwraca int odpowiadający temu kto wygral
 	switch choice() {
+
 	case 1: //player vs player
 		winner = pvp(&field)
+
 	case 2: //player vs AI
 		winner = pve(&field)
+
 	case 3: //AI vs AI
 		winner = eve(&field)
 
@@ -24,6 +31,7 @@ func main() {
 		fmt.Println("something went wrong")
 	}
 
+	//wyswietlenie ekranu wyników
 	endResult(winner, field)
 
 }
@@ -43,12 +51,14 @@ func choice() int {
 	}
 }
 
+//czyszczenie ekranu terminala
 func clear() {
 	cmd := exec.Command("clear")
 	cmd.Stdout = os.Stdout
 	cmd.Run()
 }
 
+//rysowanie planszy
 func draw(field []string) {
 	fmt.Printf("\tTic Tac Toe\n\n")
 	fmt.Printf("\t %s | %s | %s \n", field[1], field[2], field[3])

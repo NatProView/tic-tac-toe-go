@@ -1,5 +1,7 @@
 package main
 
+// TODO: Wymysl ladniejszy sposób na sprawdzanie tych warunków
+
 //import "strconv"
 /*
 func isDraw(field []string) bool {
