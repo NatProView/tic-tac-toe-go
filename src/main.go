@@ -2,12 +2,14 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"time"
 )
 
 func main() {
+	rand.Seed(time.Now().UTC().UnixNano())
 	//deklaracja arraya zawierającego znak wyswietlany w grze
 	field := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 	var winner int
