@@ -10,64 +10,48 @@ import (
 
 func main() {
 	rand.Seed(time.Now().UTC().UnixNano())
-	//deklaracja arraya zawierającego znak wyswietlany w grze
-	field := []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
+	field := [3][3]string{{"1", "2", "3"}, {"4", "5", "6"}, {"7", "8", "9"}}
 	var winner int
-
-	//funkcja witająca gracza przy starcie gry
+	isOn := true
 	hello()
 
 	//wybór trybu gry, kazda z funkcji zwraca int odpowiadający temu kto wygral
-	switch choice() {
+	for isOn {
+		switch choice() {
 
-	case 1: //player vs player
-		winner = pvp(&field)
+		case 1: //player vs player
 
-	case 2: //player vs AI
-		winner = pve(&field)
+			winner = pvp(&field)
+			isOn = false
 
-	case 3: //AI vs AI
-		winner = eve(&field)
+		case 2: //player vs AI
+			winner = pve(&field)
+			isOn = false
+		case 3: //AI vs AI
+			winner = eve(&field)
+			isOn = false
 
-	default:
-		fmt.Println("something went wrong")
+		default:
+			fmt.Println("something went wrong")
+		}
 	}
-
-	//wyswietlenie ekranu wyników
 	endResult(winner, field)
 
 }
 
-func choice() int {
-	fmt.Printf("\n\n")
-	fmt.Println("[1] Player vs Player")
-	fmt.Println("[2] Player vs AI")
-	fmt.Println("[3] AI vs AI")
-	var temp int
-	fmt.Scan(&temp)
-	if temp > 0 && temp < 4 {
-		return temp
-	} else {
-		fmt.Println("Wrong input, try again")
-		return choice()
+func endResult(winner int, field [3][3]string) {
+	clear()
+	draw(field)
+	switch winner {
+	case 0:
+		fmt.Println("[X] HAS WON THE GAME")
+	case 1:
+		fmt.Println("[O] HAS WoN ThE GAME")
+	case 3:
+		fmt.Println("IT'S A DRAW")
+	case -1:
+		fmt.Println("Something went wrong :(")
 	}
-}
-
-//czyszczenie ekranu terminala
-func clear() {
-	cmd := exec.Command("clear")
-	cmd.Stdout = os.Stdout
-	cmd.Run()
-}
-
-//rysowanie planszy
-func draw(field []string) {
-	fmt.Printf("\tTic Tac Toe\n\n")
-	fmt.Printf("\t %s | %s | %s \n", field[1], field[2], field[3])
-	fmt.Printf("\t---|---|---\n")
-	fmt.Printf("\t %s | %s | %s \n", field[4], field[5], field[6])
-	fmt.Printf("\t---|---|---\n")
-	fmt.Printf("\t %s | %s | %s \n", field[7], field[8], field[9])
 }
 
 func hello() {
@@ -84,16 +68,31 @@ func hello() {
 	time.Sleep(500 * time.Millisecond)
 	fmt.Println("\t t | o | e ")
 }
-
-func endResult(winner int, field []string) {
-	draw(field)
+func choice() int {
 	fmt.Printf("\n\n")
-	switch winner {
-	case 0:
-		fmt.Println("[X] HAS WON THE GAME")
-	case 1:
-		fmt.Println("[O] HAS WON THE GAME")
-	case 3:
-		fmt.Println("WE'VE GOT A DRAW!")
+	fmt.Println("[1] Player vs Player")
+	fmt.Println("[2] Player vs AI")
+	fmt.Println("[3] AI vs AI")
+	var temp int
+	fmt.Scan(&temp)
+	if temp > 0 && temp < 4 {
+		return temp
+	} else {
+		fmt.Println("Wrong input, try again")
+		return choice()
 	}
+}
+func draw(field [3][3]string) {
+	fmt.Printf("\tTic Tac Toe\n\n")
+	fmt.Printf("\t %s | %s | %s \n", field[0][0], field[0][1], field[0][2])
+	fmt.Printf("\t---|---|---\n")
+	fmt.Printf("\t %s | %s | %s \n", field[1][0], field[1][1], field[1][2])
+	fmt.Printf("\t---|---|---\n")
+	fmt.Printf("\t %s | %s | %s \n", field[2][0], field[2][1], field[2][2])
+}
+
+func clear() {
+	cmd := exec.Command("clear")
+	cmd.Stdout = os.Stdout
+	cmd.Run()
 }

@@ -6,116 +6,37 @@ import (
 	"time"
 )
 
-//funkcja pozwalająca na odczytanie inputu od uzytkownika
-//wywołanie jej skutkuje zmiana jednego elementu arraya na znak X albo Y
-
-func input(field **[]string, char string) { //0 ok | 1 nie ok XD
-	var input int
-	isOk := false
-	fmt.Printf("\n\tTurn of [%s]\n", char)
-	for !isOk {
-		fmt.Scan(&input)
-		for k, v := range **field {
-			if k == input && v != "X" && v != "O" {
-				(**field)[k] = char
-				isOk = true
-			}
-		}
-		if !isOk {
-			fmt.Println("[Input] Wrong input, try again")
-		}
-
-	}
-
-}
-
-//funkcja generująca input od bota,
-//wywołanie jej skutkuje zmiana jednego elementu arraya na znak X albo Y
-func inputBot(field **[]string, char string) {
-	var input int
-	isOk := false
-	fmt.Printf("\n\tTurn of [%s]\n", char)
-	time.Sleep(2 * time.Second)
-	for !isOk {
-		input = (rand.Intn(9) + 1)
-		for k, v := range **field {
-			if k == input && v != "X" && v != "O" {
-				(**field)[k] = char
-				isOk = true
-			}
-		}
-
-	}
-
-}
-
-//tryb gry player vs player, bierze dwa inputy od graczy, na zmiane
-
-func pvp(field *[]string) int {
+func pvp(field *[3][3]string) int {
 	clear()
-
-	//kazda kolejna iteracja funkcji to kolejna tura gry
-	// dla i parzystego tura [X]
-	// dla i nieparzystego tura [O]
+	var x, y int
+	//
 	for i := 0; i < 9; i++ {
-
-		draw(*field)
-		turn := i % 2
-
-		if turn == 0 { //i parzyste, tura [X]
-			input((&field), "X")
-		} else { //i nieparzyste, tura [O]
-			input((&field), "O")
-		}
-
-		switch check(*field) {
-		case 1:
-			clear()
-			return turn // 0: [X]	1: [O]
-		case 2:
-			clear()
-			return 3 // remis
-		}
-
 		clear()
-
-	}
-	return -1 //błąd
-}
-
-//AI vs AI, zero inputu od uzytkownika
-func eve(field *[]string) int {
-	clear()
-	// kazda kolejna iteracja funkcji to kolejna tura gry
-	// dla i parzystego tura [X]
-	// dla i nieparzystego tura [O]
-	for i := 0; i < 9; i++ {
-
 		draw(*field)
+
 		turn := i % 2
 
 		if turn == 0 {
-			inputBot((&field), "X")
+			fmt.Printf("\n\tTurn of [X]\n")
+			x, y = playerInput(&field)
+			(*field)[x][y] = "X"
 		} else {
-			inputBot((&field), "O")
+			fmt.Printf("\n\tTurn of [O]\n")
+			x, y = playerInput(&field)
+			(*field)[x][y] = "O"
 		}
+
 		switch check(*field) {
 		case 1:
-			clear()
 			return turn // 0: [X]	1: [O]
 		case 2:
-			clear()
 			return 3 // remis
 		}
-
-		clear()
-
 	}
 	return -1
 }
 
-//gracz vs AI, jeden input od uzytkownika
-func pve(field *[]string) int {
+func pve(field *[3][3]string) int {
 	var playerStarts bool
 	var temp string
 	if rand.Intn(2) == 1 {
@@ -130,45 +51,125 @@ func pve(field *[]string) int {
 		fmt.Println("Ready? [y]")
 		fmt.Scan(&temp)
 	}
-	clear()
 	var turn bool
 
-	// kazda kolejna iteracja funkcji to kolejna tura gry
-	// dla i parzystego tura [X]
-	// dla i nieparzystego tura [O]
 	for i := 0; i < 9; i++ {
-
+		clear()
+		var x int
+		var y int
 		if i%2 == 0 {
-			turn = true // [X]
+			turn = true
 		} else {
-			turn = false // [O]
+			turn = false
 		}
 
 		draw(*field)
-
 		switch {
 		case turn && playerStarts: //tura parzysta [X], gracz zaczyna
-			input((&field), "X")
+			fmt.Printf("\n\tTurn of [X]\n")
+			x, y = playerInput(&field)
+			(*field)[x][y] = "X"
 		case turn && !playerStarts: //tura przysta [X], AI zaczyna
-			inputBot((&field), "X")
+			fmt.Printf("\n\tTurn of [X]\n")
+			x, y = botInput(&field)
+			(*field)[x][y] = "X"
 		case !turn && playerStarts: //tura nieparzysta [O], gracz zaczyna
-			inputBot((&field), "O")
+			fmt.Printf("\n\tTurn of [O]\n")
+			x, y = botInput(&field)
+			(*field)[x][y] = "O"
 		case !turn && !playerStarts: //tura nieparzysta [O], AI zaczyna
-			input((&field), "O")
+			fmt.Printf("\n\tTurn of [O]\n")
+			x, y = playerInput(&field)
+			(*field)[x][y] = "O"
 		}
-
 		switch check(*field) {
 		case 1:
-			clear()
-			return i % 2 // 0: [X]	1: [O]
+			return i % 2 // 0 X 1 O
 		case 2:
-			clear()
-			return 3 // remis
+			return 3 //remis
 		}
-
-		clear()
-
 	}
+
 	return -1
 
+}
+
+func eve(field *[3][3]string) int {
+	var x, y int
+
+	for i := 0; i < 9; i++ {
+		clear()
+		draw(*field)
+		turn := i % 2
+
+		if turn == 0 {
+			fmt.Printf("\n\tTurn of [X]\n")
+			x, y = botInput(&field)
+			(*field)[x][y] = "X"
+		} else {
+			fmt.Printf("\n\tTurn of [O]\n")
+			x, y = botInput(&field)
+			(*field)[x][y] = "O"
+		}
+		switch check(*field) {
+		case 1:
+			return i % 2
+		case 2:
+			return 3
+		}
+	}
+	return -1
+}
+func playerInput(field **[3][3]string) (x, y int) {
+	var input int
+	isOk := false
+	for !isOk {
+		fmt.Scan(&input)
+		x, y = toMultipleValues(input)
+		if (**field)[x][y] != "O" && (**field)[x][y] != "X" {
+			isOk = true
+			return x, y
+		}
+		if !isOk {
+			fmt.Println("Wrong input, tr again")
+		}
+	}
+	return -1, -1
+}
+func botInput(field **[3][3]string) (x, y int) {
+	isOk := false
+	time.Sleep(2 * time.Second)
+	for !isOk {
+		x, y = toMultipleValues(rand.Intn(9) + 1)
+		if (**field)[x][y] != "O" && (**field)[x][y] != "X" {
+			isOk = true
+			return x, y
+		}
+	}
+	return -1, -1
+}
+func toMultipleValues(input int) (x, y int) {
+	switch input {
+	case 1:
+		return 0, 0
+	case 2:
+		return 0, 1
+	case 3:
+		return 0, 2
+	case 4:
+		return 1, 0
+	case 5:
+		return 1, 1
+	case 6:
+		return 1, 2
+	case 7:
+		return 2, 0
+	case 8:
+		return 2, 1
+	case 9:
+		return 2, 2
+	default:
+		fmt.Println("something went wrong")
+	}
+	return
 }
